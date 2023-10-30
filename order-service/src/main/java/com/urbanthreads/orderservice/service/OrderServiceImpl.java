@@ -1,38 +1,43 @@
 package com.urbanthreads.orderservice.service;
 
-import com.urbanthreads.orderservice.DTO.ItemDTO;
+import com.urbanthreads.orderservice.DTO.CustomerOrderDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class OrderServiceImpl implements OrderService{
 
     @Autowired
     private RestTemplate restTemplate;
-    @Override
-    public int stockQuantity(long id) {
-        String url = "http://localhost:8080/urban-threads/items/" + id + "/quantity";
-        Integer result = restTemplate.getForObject(url, Integer.class);
-        int quantity = (result != null) ? result : 0;
-        return quantity;
-    }
 
     @Override
-    public List<ItemDTO> stockQuantity(List<ItemDTO> items) {
-        List<ItemDTO> itemDTOS = new ArrayList<>();
-        int quantity;
-        for (ItemDTO desiredItem : items) {
-            quantity = stockQuantity(desiredItem.getId());
-            if (quantity < desiredItem.getQuantity()) {
-                itemDTOS.add(new ItemDTO(desiredItem.getId(), quantity));
+    public Optional<Map<Long, Integer>> stockQuantity(Map<Long, Integer> itemsCountRequested) {
+
+        Map<Long, Integer> itemsAvailable = restTemplate.getForObject(
+                "http://localhost:8080/urban-threads/availableitems", HashMap.class);
+        Map<Long, Integer> itemsNotAvailable = new HashMap<>();
+        for (Map.Entry<Long,Integer> itemRequest : itemsCountRequested.entrySet()) {
+            int itemInStock = (int) itemsAvailable.get(itemRequest.getKey());
+            if (itemRequest.getValue() > itemInStock) {
+                itemsNotAvailable.put(itemRequest.getKey(), itemInStock);
             }
+
         }
 
 
-        return itemDTOS;
+        return Optional.of(itemsNotAvailable);
     }
+
+    @Override
+    public Optional<UUID> makeOrder(CustomerOrderDTO customerOrderDTO) {
+
+
+
+
+        return null;
+    }
+
 }

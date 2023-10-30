@@ -8,11 +8,13 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
 public class CustomerOrderDTO {
 
+     Map<Long, Integer> itemsCountRequested;
      String street;
 
      String city;
@@ -31,13 +33,9 @@ public class CustomerOrderDTO {
 
      String email;
 
-     Address address;
+     String unitPrice;
 
-     int quantity;
-
-     BigDecimal unitPrice;
-
-     BigDecimal totalPrice;
+     String totalPrice;
 
      String ccv;
 
@@ -49,12 +47,10 @@ public class CustomerOrderDTO {
 
      String cardNumber;
 
-     Purchase purchase;
-
      String orderStatus;
 
-     LocalDateTime purchaseDate;
+     String purchaseDate;
 
-     BigDecimal purchaseAmount;
+     String purchaseAmount;
 
 }
