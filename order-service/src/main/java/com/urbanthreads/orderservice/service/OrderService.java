@@ -1,14 +1,15 @@
 package com.urbanthreads.orderservice.service;
 
-import com.urbanthreads.orderservice.DTO.ItemDTO;
+import com.urbanthreads.orderservice.DTO.CustomerOrderDTO;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public interface OrderService {
 
 
-    public List<ItemDTO> stockQuantity(List<ItemDTO> ids);
 
-
-    int stockQuantity(long id);
+    Optional<Map<Long, Integer>> stockQuantity(Map<Long, Integer> itemsCountRequested);
+    Optional<UUID> makeOrder(CustomerOrderDTO customerOrderDTO);
 }

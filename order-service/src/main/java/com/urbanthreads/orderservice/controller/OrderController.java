@@ -1,7 +1,6 @@
 package com.urbanthreads.orderservice.controller;
 
 import com.urbanthreads.orderservice.DTO.CustomerOrderDTO;
-import com.urbanthreads.orderservice.DTO.ItemDTO;
 import com.urbanthreads.orderservice.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/urban-threads")
@@ -22,16 +23,19 @@ public class OrderController {
     OrderService orderService;
     @PostMapping("/order")
     public ResponseEntity<?> order(@RequestBody CustomerOrderDTO order) {
+        Optional<Map<Long, Integer>> itemsUnavailable = orderService.stockQuantity(order.getItemsCountRequested());
+        if (itemsUnavailable.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(itemsUnavailable.get());
 
-        List<ItemDTO> itemsWithSmallerQuantity = orderService.stockQuantity(order.getItems());
-        String orderId = "Place Holder For Now";
-
-        if (itemsWithSmallerQuantity.size() == 0) {
+        }
+        Optional<UUID> orderId = orderService.makeOrder(order);
+         if (orderId.isPresent()) {
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(orderId);
         }
         else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(itemsWithSmallerQuantity);
-        }
+             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Something wrong with order DTO passed");
+
+         }
     }
 
 }
