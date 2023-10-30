@@ -33,9 +33,9 @@ public class CustomerOrderDTO {
 
      String email;
 
-     BigDecimal unitPrice;
+     String unitPrice;
 
-     BigDecimal totalPrice;
+     String totalPrice;
 
      String ccv;
 
@@ -51,6 +51,6 @@ public class CustomerOrderDTO {
 
      String purchaseDate;
 
-     BigDecimal purchaseAmount;
+     String purchaseAmount;
 
 }
