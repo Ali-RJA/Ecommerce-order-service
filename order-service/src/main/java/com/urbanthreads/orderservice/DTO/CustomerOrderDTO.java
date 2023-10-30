@@ -1,34 +1,60 @@
 package com.urbanthreads.orderservice.DTO;
 
+import com.urbanthreads.orderservice.model.*;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
 public class CustomerOrderDTO {
-    public List<ItemDTO> getItems() {
-        return items;
-    }
 
-    public void setItems(List<ItemDTO> items) {
-        this.items = items;
-    }
+     String street;
 
-    public PaymentDetailsDTO getPaymentDetails() {
-        return paymentDetails;
-    }
+     String city;
 
-    public void setPaymentDetails(PaymentDetailsDTO paymentDetails) {
-        this.paymentDetails = paymentDetails;
-    }
+     String state;
 
-    public ShippingInfoDTO getShippingInfo() {
-        return shippingInfo;
-    }
+     String postalCode;
 
-    public void setShippingInfo(ShippingInfoDTO shippingInfo) {
-        this.shippingInfo = shippingInfo;
-    }
+     String country;
 
-    private List<ItemDTO> items;
-    private PaymentDetailsDTO paymentDetails;
-    private ShippingInfoDTO shippingInfo;
+     String propertyType;
+
+     String firstName;
+
+     String lastName;
+
+     String email;
+
+     Address address;
+
+     int quantity;
+
+     BigDecimal unitPrice;
+
+     BigDecimal totalPrice;
+
+     String ccv;
+
+     String creditCardCompany;
+
+     String expirationDate;
+
+     String cardHolderName;
+
+     String cardNumber;
+
+     Purchase purchase;
+
+     String orderStatus;
+
+     LocalDateTime purchaseDate;
+
+     BigDecimal purchaseAmount;
 
 }
