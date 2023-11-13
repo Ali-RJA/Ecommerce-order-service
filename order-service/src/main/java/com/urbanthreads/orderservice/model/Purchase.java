@@ -46,7 +46,6 @@ public class Purchase {
     @Column(name = "purchase_amount")
     private BigDecimal purchaseAmount;
 
-
     @OneToOne
     @JoinColumn(name="payment_id")
     private Payment payment;

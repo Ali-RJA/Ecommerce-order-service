@@ -1,7 +1,6 @@
 package com.urbanthreads.orderservice.controller;
 
 import com.urbanthreads.orderservice.DTO.CustomerOrderDTO;
-import com.urbanthreads.orderservice.model.TransactionRequest;
 import com.urbanthreads.orderservice.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

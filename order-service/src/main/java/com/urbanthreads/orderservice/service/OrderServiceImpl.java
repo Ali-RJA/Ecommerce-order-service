@@ -1,8 +1,12 @@
 package com.urbanthreads.orderservice.service;
 
 import com.urbanthreads.orderservice.DTO.CustomerOrderDTO;
+import com.urbanthreads.orderservice.DTO.PaymentDTO;
 import com.urbanthreads.orderservice.model.OrderItem;
+import com.urbanthreads.orderservice.model.OrderStatus;
+import com.urbanthreads.orderservice.model.Payment;
 import com.urbanthreads.orderservice.model.Purchase;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -96,13 +100,42 @@ public class OrderServiceImpl implements OrderService {
         //TODO: save purchase to database
         //purchaseRepository.save(purchase);
 
+        //set payment information from the front end
+        //TODO: refactor this part to a separate method
+        Payment payment = new Payment();
+        payment.setCardHolderName(customerOrderDTO.getCardHolderName());
+        payment.setCardNumber(customerOrderDTO.getCardNumber());
+        payment.setExpirationDate(customerOrderDTO.getExpirationDate());
+        payment.setCcv(customerOrderDTO.getCcv());
+        payment.setPurchase(purchase);
+
+
+        PaymentDTO paymentDTO = new PaymentDTO(payment, totalAmount);
+
+
         //TODO: call payment service
-        return Optional.ofNullable(purchase.getId());
+        boolean paymentSuccess = callBankingServiceToMakePayment(paymentDTO);
+        if (paymentSuccess) {
+            purchase.setOrderStatus(OrderStatus.PAID);
+            return Optional.ofNullable(purchase.getId());
+        } else {
+            // TODO: handle payment failure
+            return Optional.empty();
+        }
     }
 
 
+    private boolean callBankingServiceToMakePayment(PaymentDTO paymentDTO) {
+        //TODO: replace with banking service url
+        String url = "http://banking-service-url/make-payment";
+
+        ResponseEntity<?> response = restTemplate.postForEntity(url, paymentDTO, ResponseEntity.class);
+
+        return response.getStatusCode() == HttpStatus.OK;
+    }
+
     private BigDecimal getUnitPriceForItem(Long itemId) {
-        //TODO: get unit price from item service
+        //TODO: get unit price from inventory service
         return BigDecimal.valueOf(10);
     }
 }
