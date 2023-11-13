@@ -1,0 +1,13 @@
+
+{	java:S120"ZRename this package name to match the regular expression '^[a-z_]+(\.[a-z_][a-z0-9_]*)*$'.(ğáÌùÿÿÿÿ8·Å’·¼1
+]
+java:S1128"@Remove this unused import 'com.urbanthreads.orderservice.model'.(ÈÅûê8ÁÅ’·¼1
+R
+java:S1128"0Remove this unused import 'jakarta.persistence'.(Î«Ô§úÿÿÿÿ8ÂÅ’·¼1
+N
+java:S1128"1Remove this unused import 'java.math.BigDecimal'.(êêŠ8ÃÅ’·¼1
+V
+java:S1128	"4Remove this unused import 'java.time.LocalDateTime'.(æÃ§ƒüÿÿÿÿ8ÄÅ’·¼1
+M
+java:S1128
+"+Remove this unused import 'java.util.List'.(Õë±Äøÿÿÿÿ8ÄÅ’·¼1

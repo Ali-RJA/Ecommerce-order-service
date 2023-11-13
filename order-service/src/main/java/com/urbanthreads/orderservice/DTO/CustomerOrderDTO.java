@@ -35,6 +35,9 @@ public class CustomerOrderDTO {
 
      String unitPrice;
 
+     String quantity;
+
+
      String totalPrice;
 
      String ccv;
