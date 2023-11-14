@@ -38,7 +38,7 @@ public class OrderItem {
 
     @PrePersist
     @PreUpdate
-    public void getTotalPrice() {
+    public void totalPrice() {
         if (unitPrice != null && quantity > 0) {
            totalPrice = unitPrice.multiply(BigDecimal.valueOf(quantity));
         }

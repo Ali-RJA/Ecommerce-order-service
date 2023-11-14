@@ -31,6 +31,7 @@ public class Payment {
     @OneToOne(mappedBy = "payment")
     private Purchase purchase;
 
+
     public int setExpirationDate(String expirationDate) {
 
         Pattern pattern = Pattern.compile("^(0[1-9]|1[0-2])-[0-9]{4}$");
@@ -89,7 +90,6 @@ public class Payment {
 
     @Enumerated(EnumType.STRING)
     private CreditCardCompany creditCardCompany;
-
 
 
 
