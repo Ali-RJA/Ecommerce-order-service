@@ -26,8 +26,6 @@ public class OrderServiceImpl implements OrderService{
             }
 
         }
-
-
         return Optional.of(itemsNotAvailable);
     }
 
