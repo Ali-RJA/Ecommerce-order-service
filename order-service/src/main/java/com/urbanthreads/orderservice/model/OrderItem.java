@@ -27,6 +27,7 @@ public class OrderItem {
     @Column(name = "item_id")
     private long itemId;
 
+
     @Column(name="quantity")
     private int quantity;
 

@@ -1,6 +1,8 @@
 package com.urbanthreads.orderservice.service;
 
 import com.urbanthreads.orderservice.DTO.CustomerOrderDTO;
+import com.urbanthreads.orderservice.DTO.ShippingOrderDTO;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -10,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import org.springframework.transaction.annotation.*;
 
 
 import java.net.URI;
@@ -70,8 +71,13 @@ public class OrderServiceImpl implements OrderService{
 
 
 
-
         return null;
+    }
+
+    @Override
+    @KafkaListener(topics = "shipping", groupId = "US-Shipping")
+    public void shippingListener(ShippingOrderDTO shippingOrderDTO) {
+        System.out.println("Shipping order received: " + shippingOrderDTO.getShippingLabel());
     }
 
 }

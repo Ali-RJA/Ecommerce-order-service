@@ -30,6 +30,7 @@ public class Purchase {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
+
     @OneToMany(mappedBy = "purchase")
     private Set<OrderItem> orderItems = new HashSet<>();
 
@@ -45,6 +46,9 @@ public class Purchase {
 
     @Column(name = "purchase_amount")
     private BigDecimal purchaseAmount;
+
+    @Column(name = "shipping_label")
+    private String shippingLabel;
 
 
     @OneToOne
