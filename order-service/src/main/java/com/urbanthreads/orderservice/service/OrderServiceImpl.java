@@ -88,5 +88,13 @@ public class OrderServiceImpl implements OrderService{
          */
     }
 
+    public void callShippingCompany(String orderId) {
+        ShippingOrderDTO shippingOrderDTO = new ShippingOrderDTO();
+        shippingOrderDTO.setOrderId(orderId);
+        String url = "http://localhost:8080/urban-threads/shipping/initiate";
+        restTemplate.postForObject(url, shippingOrderDTO, ShippingOrderDTO.class);
+
+    }
+
 
 }
