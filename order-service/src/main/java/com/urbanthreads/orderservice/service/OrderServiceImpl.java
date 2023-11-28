@@ -6,12 +6,16 @@ import com.urbanthreads.orderservice.model.OrderItem;
 import com.urbanthreads.orderservice.model.OrderStatus;
 import com.urbanthreads.orderservice.model.Payment;
 import com.urbanthreads.orderservice.model.Purchase;
+import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import com.urbanthreads.orderservice.repository.PurchaseRepository;
+import com.urbanthreads.orderservice.repository.OrderItemRepository;
+import com.urbanthreads.orderservice.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.web.client.RestTemplate;
@@ -28,6 +32,14 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    PurchaseRepository purchaseRepo;
+
+    @Autowired
+    OrderItemRepository orderItemRepo;
+
+    @Autowired
+    PaymentRepository paymentRepo;
     @Override
     public Optional<Map<Long, Integer>> stockQuantity(Map<Long, Integer> itemsCountRequested) {
         List<Long> ids = new ArrayList<>(itemsCountRequested.keySet());
@@ -74,52 +86,57 @@ public class OrderServiceImpl implements OrderService {
         1. Call reduce stock. If return is integer != order amount, return message. Else, return id.
         2. In front end, if message is returned, front end should call "/orderstock" and display exact stock issue.
          */
+        //if stock is enough
+        if(stockQuantity( customerOrderDTO.getItemsCountRequested()).isPresent()) {
+            Map<Long, Integer> itemsCountRequested = customerOrderDTO.getItemsCountRequested();
+            Map<Long, BigDecimal> unitPrices = customerOrderDTO.getUnitPrice();
+            Purchase purchase = new Purchase();
+             BigDecimal totalAmount = BigDecimal.ZERO;
+            Set<OrderItem> orderItems = new HashSet<>();
+            for (Map.Entry<Long, Integer> entry : itemsCountRequested.entrySet()) {
+                Long itemId = entry.getKey();
+                Integer quantity = entry.getValue();
 
-        //IF STOCK IS ENOUGH
-        Map<Long, Integer> itemsCountRequested = customerOrderDTO.getItemsCountRequested();
-        Purchase purchase = new Purchase();
-        BigDecimal totalAmount = BigDecimal.ZERO;
-        for (Map.Entry<Long, Integer> entry : itemsCountRequested.entrySet()) {
-            Long itemId = entry.getKey();
-            Integer quantity = entry.getValue();
+                OrderItem orderItem = new OrderItem();
+                orderItem.setItemId(itemId);
+                orderItem.setQuantity(quantity);
 
-            OrderItem orderItem = new OrderItem();
-            orderItem.setItemId(itemId);
-            orderItem.setQuantity(quantity);
+                orderItem.setPurchase(purchase);
+                BigDecimal unitPrice = unitPrices.get(itemId);
+                orderItem.setUnitPrice(unitPrice);
+                orderItem.setTotalPrice(unitPrice.multiply(BigDecimal.valueOf(quantity)));
 
-            BigDecimal unitPrice = getUnitPriceForItem(itemId);
-            orderItem.setUnitPrice(unitPrice);
+                orderItems.add(orderItem);
+                //save orderItems to the database
+                orderItemRepo.save(orderItem);
+                totalAmount = totalAmount.add(orderItem.getTotalPrice());
+            }
+            purchase.setOrderItems(orderItems);
+            purchase.setPurchaseAmount(totalAmount);
 
-            //purchase.addOrderItem(orderItem);
 
-            totalAmount = totalAmount.add(orderItem.getTotalPrice());
+            //set payment information from the front end
+            Payment payment = new Payment();
+            payment.setCardHolderName(customerOrderDTO.getCardHolderName());
+            payment.setCardNumber(customerOrderDTO.getCardNumber());
+            payment.setExpirationDate(customerOrderDTO.getExpirationDate());
+            payment.setCcv(customerOrderDTO.getCcv());
+            payment.setPurchase(purchase);
+            paymentRepo.save(payment);
+            PaymentDTO paymentDTO = new PaymentDTO(payment, totalAmount);
+
+            //TODO: call payment service
+            boolean paymentSuccess = callBankingServiceToMakePayment(paymentDTO);
+            if (paymentSuccess) {
+                purchase.setOrderStatus(OrderStatus.PAID);
+                purchaseRepo.save(purchase);
+                return Optional.ofNullable(purchase.getId());
+            } else {
+                // TODO: handle payment failure
+                return Optional.empty();
+            }
         }
-
-        purchase.setPurchaseAmount(totalAmount);
-
-        //TODO: save purchase to database
-        //purchaseRepository.save(purchase);
-
-        //set payment information from the front end
-        //TODO: refactor this part to a separate method
-        Payment payment = new Payment();
-        payment.setCardHolderName(customerOrderDTO.getCardHolderName());
-        payment.setCardNumber(customerOrderDTO.getCardNumber());
-        payment.setExpirationDate(customerOrderDTO.getExpirationDate());
-        payment.setCcv(customerOrderDTO.getCcv());
-        payment.setPurchase(purchase);
-
-
-        PaymentDTO paymentDTO = new PaymentDTO(payment, totalAmount);
-
-
-        //TODO: call payment service
-        boolean paymentSuccess = callBankingServiceToMakePayment(paymentDTO);
-        if (paymentSuccess) {
-            purchase.setOrderStatus(OrderStatus.PAID);
-            return Optional.ofNullable(purchase.getId());
-        } else {
-            // TODO: handle payment failure
+        else {//if stock is not enough
             return Optional.empty();
         }
     }
@@ -132,11 +149,6 @@ public class OrderServiceImpl implements OrderService {
         ResponseEntity<?> response = restTemplate.postForEntity(url, paymentDTO, ResponseEntity.class);
 
         return response.getStatusCode() == HttpStatus.OK;
-    }
-
-    private BigDecimal getUnitPriceForItem(Long itemId) {
-        //TODO: get unit price from inventory service
-        return BigDecimal.valueOf(10);
     }
 }
 
