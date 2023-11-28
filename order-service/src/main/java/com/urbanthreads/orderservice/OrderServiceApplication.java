@@ -39,6 +39,9 @@ public class OrderServiceApplication {
 
 		JsonDeserializer<ShippingOrderDTO> deserializer = new JsonDeserializer<>(ShippingOrderDTO.class);
 		deserializer.addTrustedPackages("*");
+		deserializer.setUseTypeMapperForKey(false); // Ignore __TypeId__ in the message key
+		deserializer.setUseTypeHeaders(false); // Ignore __TypeId__ in the message headers
+
 
 		return new DefaultKafkaConsumerFactory<>(configProps, new StringDeserializer(), deserializer);
 }
