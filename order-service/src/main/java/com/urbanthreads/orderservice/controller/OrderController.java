@@ -23,7 +23,6 @@ public class OrderController {
         Optional<Map<Long, Integer>> itemsUnavailable = orderService.stockQuantity(order.getItemsCountRequested());
         if (itemsUnavailable.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(itemsUnavailable.get());
-
         }
         Optional<UUID> orderId = orderService.makeOrder(order);
          if (orderId.isPresent()) {
@@ -34,16 +33,5 @@ public class OrderController {
 
          }
     }
-
-    @PostMapping("/orderstock")
-    public ResponseEntity<?> order(@RequestBody Map<Long, Integer> orderStock) {
-        Optional<Map<Long, Integer>> itemsUnavailable = orderService.stockQuantity(orderStock);
-        if (itemsUnavailable.isPresent()) {
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(itemsUnavailable.get());
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body("All items available!");
-    }
-
-
 
 }
