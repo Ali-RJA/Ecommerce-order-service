@@ -125,7 +125,6 @@ public class OrderServiceImpl implements OrderService {
             paymentRepo.save(payment);
             PaymentDTO paymentDTO = new PaymentDTO(payment, totalAmount);
 
-            //TODO: call payment service
             boolean paymentSuccess = callBankingServiceToMakePayment(paymentDTO);
             if (paymentSuccess) {
                 purchase.setOrderStatus(OrderStatus.PAID);
@@ -143,11 +142,8 @@ public class OrderServiceImpl implements OrderService {
 
 
     private boolean callBankingServiceToMakePayment(PaymentDTO paymentDTO) {
-        //TODO: replace with banking service url
-        String url = "http://banking-service-url/make-payment";
-
+        String url = "http://localhost:8080/make-payment";
         ResponseEntity<?> response = restTemplate.postForEntity(url, paymentDTO, ResponseEntity.class);
-
         return response.getStatusCode() == HttpStatus.OK;
     }
 }

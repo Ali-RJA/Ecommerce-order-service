@@ -23,7 +23,6 @@ public class OrderController {
         Optional<Map<Long, Integer>> itemsUnavailable = orderService.stockQuantity(order.getItemsCountRequested());
         if (itemsUnavailable.isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(itemsUnavailable.get());
-
         }
         Optional<UUID> orderId = orderService.makeOrder(order);
          if (orderId.isPresent()) {
