@@ -46,6 +46,9 @@ public class Purchase {
     @Column(name = "purchase_amount")
     private BigDecimal purchaseAmount;
 
+    @Column(name = "shipping_label")
+    private String shippingLabel;
+
     @OneToOne
     @JoinColumn(name="payment_id")
     private Payment payment;

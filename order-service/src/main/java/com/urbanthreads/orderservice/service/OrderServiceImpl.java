@@ -2,12 +2,15 @@ package com.urbanthreads.orderservice.service;
 
 import com.urbanthreads.orderservice.DTO.CustomerOrderDTO;
 import com.urbanthreads.orderservice.DTO.PaymentDTO;
+import com.urbanthreads.orderservice.DTO.ShippingOrderDTO;
 import com.urbanthreads.orderservice.model.OrderItem;
 import com.urbanthreads.orderservice.model.OrderStatus;
 import com.urbanthreads.orderservice.model.Payment;
 import com.urbanthreads.orderservice.model.Purchase;
 import org.antlr.v4.runtime.misc.LogManager;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.http.HttpStatus;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -145,6 +148,26 @@ public class OrderServiceImpl implements OrderService {
         String url = "http://localhost:8080/make-payment";
         ResponseEntity<?> response = restTemplate.postForEntity(url, paymentDTO, ResponseEntity.class);
         return response.getStatusCode() == HttpStatus.OK;
+    }
+    @KafkaListener(topics = "order-shipping", groupId = "us-shipping")
+    public void shippingListener(ConsumerRecord<String, ShippingOrderDTO> consumerRecord) {
+        System.out.println("Shipping order received: " + consumerRecord.value().getShippingLabel());
+
+        /*
+        1. get the order id
+        2. call order service to get the Purchase object (which is the order)
+        3. set the shipping label
+        4. save the purchase object
+         */
+
+    }
+
+    public void callShippingCompany(String orderId) {
+        ShippingOrderDTO shippingOrderDTO = new ShippingOrderDTO();
+        shippingOrderDTO.setOrderId(orderId);
+        String url = "http://localhost:8080/urban-threads/shipping/initiate";
+        restTemplate.postForObject(url, shippingOrderDTO, ShippingOrderDTO.class);
+
     }
 }
 
